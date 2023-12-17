@@ -11,6 +11,7 @@
 */
 import React, { Component } from "react";
 import { Link } from "react-router-dom";
+import { Login } from "./axios/index";
 import {
   Layout,
   Menu,
@@ -21,6 +22,7 @@ import {
   Form,
   Input,
   Switch,
+  message,
 } from "antd";
 import signinbg from "../assets/images/img-signin.jpg";
 import {
@@ -115,14 +117,36 @@ const signin = [
   </svg>,
 ];
 export default class SignIn extends Component {
+  state = { identityNumber: "", users: [] };
+
+  handleLogin = (e, identityNumber) => {
+    e.preventDefault();
+    Login(identityNumber)
+      .then((res) => {
+        if (res.data.token) {
+          message.success("Giriş Başarılı", 5);
+          localStorage.setItem('token',JSON.stringify(res.data.token))
+          console.log(res.data.token);
+        }
+      })
+      .catch((error) => {
+        if (error.response) {
+          message.error(error.response.data.message, 5);
+        } else {
+          console.log(error + "asd");
+        }
+      });
+  };
+
   render() {
     const onFinish = (values) => {
-      console.log("Success:", values);
+      // console.log("Success:", values);
     };
 
     const onFinishFailed = (errorInfo) => {
       console.log("Failed:", errorInfo);
     };
+
     return (
       <>
         <Layout className="layout-default layout-signin">
@@ -181,39 +205,21 @@ export default class SignIn extends Component {
                 >
                   <Form.Item
                     className="username"
-                    label="Email"
-                    name="email"
+                    label="Tc.Kimlik No"
+                    name="IdentityNumber"
                     rules={[
                       {
                         required: true,
-                        message: "Please input your email!",
+                        message: "Please input your IdentityNumber!",
                       },
                     ]}
                   >
-                    <Input placeholder="Email" />
-                  </Form.Item>
-
-                  <Form.Item
-                    className="username"
-                    label="Password"
-                    name="password"
-                    rules={[
-                      {
-                        required: true,
-                        message: "Please input your password!",
-                      },
-                    ]}
-                  >
-                    <Input placeholder="Password" />
-                  </Form.Item>
-
-                  <Form.Item
-                    name="remember"
-                    className="aligin-center"
-                    valuePropName="checked"
-                  >
-                    <Switch defaultChecked onChange={onChange} />
-                    Remember me
+                    <Input
+                      onChange={(e) => {
+                        this.setState({ identityNumber: e.target.value });
+                      }}
+                      placeholder="Tc.Kimlik No"
+                    />
                   </Form.Item>
 
                   <Form.Item>
@@ -221,8 +227,11 @@ export default class SignIn extends Component {
                       type="primary"
                       htmlType="submit"
                       style={{ width: "100%" }}
+                      onClick={(e) =>
+                        this.handleLogin(e, this.state.identityNumber)
+                      }
                     >
-                      SIGN IN
+                      Giriş Yap
                     </Button>
                   </Form.Item>
                   <p className="font-semibold text-muted">

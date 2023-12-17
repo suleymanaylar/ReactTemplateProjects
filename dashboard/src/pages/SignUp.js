@@ -193,7 +193,6 @@ export default class SignUp extends Component {
               <p className="text-center my-25 font-semibold text-muted">Or</p>
               <Form
                 name="basic"
-                initialValues={{ remember: true }}
                 onFinish={onFinish}
                 onFinishFailed={onFinishFailed}
                 className="row-col"
@@ -222,16 +221,6 @@ export default class SignUp extends Component {
                 >
                   <Input placeholder="Passwoed" />
                 </Form.Item>
-
-                <Form.Item name="remember" valuePropName="checked">
-                  <Checkbox>
-                    I agree the{" "}
-                    <a href="#pablo" className="font-bold text-dark">
-                      Terms and Conditions
-                    </a>
-                  </Checkbox>
-                </Form.Item>
-
                 <Form.Item>
                   <Button
                     style={{ width: "100%" }}
@@ -287,7 +276,7 @@ export default class SignUp extends Component {
             </Menu>
             <p className="copyright">
               {" "}
-              Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
+              {/* Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "} */}
             </p>
           </Footer>
         </div>
