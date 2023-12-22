@@ -3,6 +3,8 @@ import { Table, Button, Modal, Form, Input, Select } from "antd";
 import { Popconfirm, message } from "antd";
 import "alertifyjs/build/css/alertify.css";
 import { PlusOutlined } from "@ant-design/icons";
+import { getUsersList } from "../axios/index";
+import { getData } from "../services/AccessAPI";
 
 export default class Users extends Component {
   state = {
@@ -10,28 +12,67 @@ export default class Users extends Component {
     isModalVisible: false,
     selectedUser: null,
     roles: [],
+    token: null,
   };
 
   async componentDidMount() {
     await this.getUsers();
     await this.getRoles();
   }
+  // getUsersList = () => {
+  //   getUsersList()
+  //     .then((res) => {
+  //       this.setState({ users: res });
+  //     })
+  //     .catch((error) => {
+  //       if (error.response) {
+  //         message.error(error.response.data.message, 5);
+  //       } else {
+  //         console.error(error); // Hata mesajını daha ayrıntılı göstermek için console.error kullanabilirsiniz
+  //       }
+  //     });
+  // };
+
+  // getUsers = () => {
+  //   fetch("https://localhost:44307/api/user", {
+  //     headers: {
+  //       "Content-Type": "application/json",
+  //       Accept: "text/plain",
+  //       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
+  //     },
+  //   })
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error("Sunucudan veri alınamadı.");
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       // console.log("Sunucudan gelen veri:", data);
+  //       console.log(data);
+  //       this.setState({ users: data });
+  //     })
+  //     .catch((error) => {
+  //       console.error("Veri alımı hatası:", error);
+  //     });
+  // };
 
   getUsers = () => {
-    fetch("https://localhost:44307/api/user")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Sunucudan veri alınamadı.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        // console.log("Sunucudan gelen veri:", data);
-        this.setState({ users: data });
-      })
-      .catch((error) => {
-        console.error("Veri alımı hatası:", error);
-      });
+    getData(`/user`).then((result) => {
+      let responseJson = result;
+      if (responseJson) {
+        this.setState({ users: JSON.parse(responseJson) });
+      }
+    });
+  };
+
+  getRoles = () => {
+    getData(`/Generals/GetAllRoleForTableDropdown`).then((result) => {
+      let responseJson = result;
+      if (responseJson) {
+        this.setState({ users: JSON.parse(responseJson) });
+      }
+    });
   };
   getRoles = () => {
     fetch("https://localhost:44307/api/Generals/GetAllRoleForTableDropdown")

@@ -31,9 +31,8 @@ import {
   InstagramOutlined,
   GithubOutlined,
 } from "@ant-design/icons";
-function onChange(checked) {
-  console.log(`switch to ${checked}`);
-}
+import SessionManager from "../Auth/SessionManager";
+
 const { Title } = Typography;
 const { Header, Footer, Content } = Layout;
 const template = [
@@ -120,22 +119,28 @@ export default class SignIn extends Component {
   state = { identityNumber: "", users: [] };
 
   handleLogin = (e, identityNumber) => {
-    e.preventDefault();
-    Login(identityNumber)
-      .then((res) => {
-        if (res.data.token) {
-          message.success("Giriş Başarılı", 5);
-          localStorage.setItem('token',JSON.stringify(res.data.token))
-          console.log(res.data.token);
+    fetch("https://localhost:44307/api/Account/Login/" + identityNumber)
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Sunucudan veri alınamadı.");
         }
+        return response.json();
+      })
+      .then((result) => {
+        SessionManager.setUserSession(
+          result.userName,
+          result.token,
+          result.userId,
+          result.usersRole
+        );
+        window.location.href = "/";
       })
       .catch((error) => {
-        if (error.response) {
-          message.error(error.response.data.message, 5);
-        } else {
-          console.log(error + "asd");
-        }
+        console.error("Veri alımı hatası:", error);
       });
+  };
+  handleEdit = (user) => {
+    this.setState({ selectedUser: user, isModalVisible: true });
   };
 
   render() {
@@ -150,42 +155,6 @@ export default class SignIn extends Component {
     return (
       <>
         <Layout className="layout-default layout-signin">
-          <Header>
-            <div className="header-col header-brand">
-              <h5>Muse Dashboard</h5>
-            </div>
-            <div className="header-col header-nav">
-              <Menu mode="horizontal" defaultSelectedKeys={["1"]}>
-                <Menu.Item key="1">
-                  <Link to="/dashboard">
-                    {template}
-                    <span> Dashboard</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="2">
-                  <Link to="/profile">
-                    {profile}
-                    <span>Profile</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="3">
-                  <Link to="/sign-up">
-                    {signup}
-                    <span> Sign Up</span>
-                  </Link>
-                </Menu.Item>
-                <Menu.Item key="4">
-                  <Link to="/sign-in">
-                    {signin}
-                    <span> Sign In</span>
-                  </Link>
-                </Menu.Item>
-              </Menu>
-            </div>
-            <div className="header-col header-btn">
-              <Button type="primary">FREE DOWNLOAD</Button>
-            </div>
-          </Header>
           <Content className="signin">
             <Row gutter={[24, 0]} justify="space-around">
               <Col
@@ -195,7 +164,7 @@ export default class SignIn extends Component {
               >
                 <Title className="mb-15">Sign In</Title>
                 <Title className="font-regular text-muted" level={5}>
-                  Enter your email and password to sign in
+                  Tc Kimlik Numaranız İle Giriş Yapabilirsiniz
                 </Title>
                 <Form
                   onFinish={onFinish}
@@ -234,12 +203,6 @@ export default class SignIn extends Component {
                       Giriş Yap
                     </Button>
                   </Form.Item>
-                  <p className="font-semibold text-muted">
-                    Don't have an account?{" "}
-                    <Link to="/sign-up" className="text-dark font-bold">
-                      Sign Up
-                    </Link>
-                  </p>
                 </Form>
               </Col>
               <Col
@@ -254,14 +217,14 @@ export default class SignIn extends Component {
             </Row>
           </Content>
           <Footer>
-            <Menu mode="horizontal">
+            {/* <Menu mode="horizontal">
               <Menu.Item>Company</Menu.Item>
               <Menu.Item>About Us</Menu.Item>
               <Menu.Item>Teams</Menu.Item>
               <Menu.Item>Products</Menu.Item>
               <Menu.Item>Blogs</Menu.Item>
               <Menu.Item>Pricing</Menu.Item>
-            </Menu>
+            </Menu> */}
             <Menu mode="horizontal" className="menu-nav-social">
               <Menu.Item>
                 <Link to="#">{<DribbbleOutlined />}</Link>
@@ -290,7 +253,7 @@ export default class SignIn extends Component {
             </Menu>
             <p className="copyright">
               {" "}
-              Copyright © 2021 Muse by <a href="#pablo">Creative Tim</a>.{" "}
+              Copyright © 2023 Suleyman Aylar <a href="#pablo"></a>.{" "}
             </p>
           </Footer>
         </Layout>

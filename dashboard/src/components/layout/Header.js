@@ -1,5 +1,3 @@
-
-
 import { useState, useEffect } from "react";
 
 import {
@@ -28,6 +26,7 @@ import { NavLink, Link } from "react-router-dom";
 import styled from "styled-components";
 import avtar from "../../assets/images/team-2.jpg";
 import Users from "../../pages/Users";
+import SessionManager from "../../Auth/SessionManager";
 
 const ButtonContainer = styled.div`
   .ant-btn-primary {
@@ -292,7 +291,7 @@ function Header({
           </div>
         </Col>
         <Col span={24} md={18} className="header-control">
-          <Badge size="small" count={4}>
+          {/* <Badge size="small" count={4}>
             <Dropdown overlay={menu} trigger={["click"]}>
               <a
                 href="#pablo"
@@ -302,7 +301,7 @@ function Header({
                 {bell}
               </a>
             </Dropdown>
-          </Badge>
+          </Badge> */}
           <Button type="link" onClick={showDrawer}>
             {logsetting}
           </Button>
@@ -395,15 +394,7 @@ function Header({
                   <Title level={5}>Navbar Fixed </Title>
                   <Switch onChange={(e) => handleFixedNavbar(e)} />
                 </div>
-                <div className="ant-docment">
-                  <ButtonContainer>
-                    <Button type="black" size="large">
-                      FREE DOWNLOAD
-                    </Button>
-                    <Button size="large">VIEW DOCUMENTATION</Button>
-                  </ButtonContainer>
-                </div>
-                <div className="viewstar">
+                {/* <div className="viewstar">
                   <a href="#pablo">{<StarOutlined />} Star</a>
                   <a href="#pablo"> 190</a>
                 </div>
@@ -416,13 +407,13 @@ function Header({
                     <Button type="black">{<TwitterOutlined />}TWEET</Button>
                     <Button type="black">{<FacebookFilled />}SHARE</Button>
                   </ButtonContainer>
-                </div>
+                </div> */}
               </div>
             </div>
           </Drawer>
           <Link to="/sign-in" className="btn-sign-in">
             {profile}
-            <span>Sign in</span>
+            <span>{SessionManager.getUserName()}</span>
           </Link>
         </Col>
       </Row>

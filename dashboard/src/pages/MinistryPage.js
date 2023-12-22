@@ -1,7 +1,8 @@
 import React, { Component } from "react";
-import { Table, Button,Badge } from "antd";
+import { Table, Button, Badge } from "antd";
 import { Popconfirm, message } from "antd";
 import { withRouter } from "react-router-dom";
+import { getData } from "../services/AccessAPI";
 
 class MinistryPage extends Component {
   state = {
@@ -13,23 +14,31 @@ class MinistryPage extends Component {
   async componentDidMount() {
     await this.getApplications();
   }
-
   getApplications = () => {
-    fetch("https://localhost:44307/api/MinistryPage")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Sunucudan veri alınamadı.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        console.log("Sunucudan gelen veri:", data);
-        this.setState({ applications: data });
-      })
-      .catch((error) => {
-        console.error("Veri alımı hatası:", error);
-      });
+    getData(`/MinistryPage/GetAll`).then((result) => {
+      let responseJson = result;
+      if (responseJson) {
+        this.setState({ applications: JSON.parse(responseJson) });
+      }
+    });
   };
+  // getApplications = () => {
+  //   let token=SessionManager.getToken();
+  //   fetch("https://localhost:44307/api/MinistryPage")
+  //     .then((response) => {
+  //       if (!response.ok) {
+  //         throw new Error("Sunucudan veri alınamadı.");
+  //       }
+  //       return response.json();
+  //     })
+  //     .then((data) => {
+  //       console.log("Sunucudan gelen veri:", data);
+  //       this.setState({ applications: data });
+  //     })
+  //     .catch((error) => {
+  //       console.error("Veri alımı hatası:", error);
+  //     });
+  // };
 
   handleApproval = (applicationId) => {
     message.success("Onaylama İşlemi Gerçekleştirildi.AppId: " + applicationId);
@@ -91,7 +100,7 @@ class MinistryPage extends Component {
             <Button
               style={{
                 margin: "5px",
-                backgroundColor: "#FFD700", 
+                backgroundColor: "#FFD700",
                 borderColor: "#FFD700",
                 color: "#fff",
               }}
