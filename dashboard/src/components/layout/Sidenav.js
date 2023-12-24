@@ -1,6 +1,5 @@
-
 // import { useState } from "react";
-import { Menu, Button } from "antd";
+import { Menu } from "antd";
 import { NavLink, useLocation } from "react-router-dom";
 import logo from "../../assets/images/logo.png";
 
@@ -158,32 +157,20 @@ function Sidenav({ color }) {
       <hr />
       <Menu theme="light" mode="inline">
         <Menu.Item key="1">
-          <NavLink to="/dashboard">
+          <NavLink to="/MinistryPage">
             <span
               className="icon"
               style={{
-                background: page === "dashboard" ? color : "",
+                background: page === "MinistryPage" ? color : "",
               }}
             >
-              {dashboard}
+              {rtl}
             </span>
             <span className="label">Anasayfa</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item key="2">
-          <NavLink to="/Users">
-            <span
-              className="icon"
-              style={{
-                background: page === "Users" ? color : "",
-              }}
-            >
-              {profile}
-            </span>
-            <span className="label">Kullanıcılar</span>
-          </NavLink>
-        </Menu.Item>
-        <Menu.Item key="3">
+
+        {/* <Menu.Item key="3">
           <NavLink to="/tables">
             <span
               className="icon"
@@ -223,20 +210,47 @@ function Sidenav({ color }) {
           </NavLink>
         </Menu.Item>
         <Menu.Item key="6">
-          <NavLink to="/MinistryPage">
+          <NavLink to="/dashboard">
             <span
               className="icon"
               style={{
-                background: page === "MinistryPage" ? color : "",
+                background: page === "dashboard" ? color : "",
               }}
             >
-              {rtl}
+              {dashboard}
             </span>
-            <span className="label">Admin Sayfası</span>
+            <span className="label">dashboard</span>
+          </NavLink>
+        </Menu.Item> */}
+        <Menu.Item className="menu-item-header" key="7">
+          Yönetici Sayfası
+        </Menu.Item>
+        <Menu.Item key="2">
+          
+          <NavLink to="/Users">
+            <span
+              className="icon"
+              style={{
+                background: page === "Users" ? color : "",
+              }}
+            >
+              {profile}
+            </span>
+            <span className="label">Kullanıcılar</span>
           </NavLink>
         </Menu.Item>
-        <Menu.Item className="menu-item-header" key="7">
-          Account Pages
+        <Menu.Item key="3">
+          <NavLink to="/Roles">
+            <span
+              className="icon"
+              style={{
+                background: page === "Roles" ? color : "",
+              }}
+            >
+              {profile}
+            </span>
+            <span className="label">Rolller</span>
+          </NavLink>
         </Menu.Item>
         <Menu.Item key="8">
           <NavLink to="/profile">

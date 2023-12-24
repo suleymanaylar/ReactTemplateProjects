@@ -1,18 +1,21 @@
 import React, { Component } from "react";
-import { Table, Button, Badge } from "antd";
+import { Table, Button, Badge, Tag } from "antd";
 import { Popconfirm, message } from "antd";
 import { withRouter } from "react-router-dom";
 import { getData } from "../services/AccessAPI";
+import SessionManager from "../Auth/SessionManager";
 
 class MinistryPage extends Component {
   state = {
     applications: [],
     selectedApplications: null,
     applicationsDetail: [],
+    roleNames: "",
   };
 
   async componentDidMount() {
     await this.getApplications();
+    this.setState({ roleNames: SessionManager.getRoleName() });
   }
   getApplications = () => {
     getData(`/MinistryPage/GetAll`).then((result) => {
@@ -54,7 +57,7 @@ class MinistryPage extends Component {
     });
   };
   render() {
-    const { applications } = this.state;
+    const { applications, roleNames } = this.state;
 
     const columns = [
       {
@@ -62,41 +65,44 @@ class MinistryPage extends Component {
         key: "actions",
         render: (text, record) => (
           <span>
-            <Popconfirm
-              key="success"
-              title="Onaylamak İstediğinize Emin misiniz?"
-              okText="Evet"
-              cancelText="Hayır"
-              onConfirm={() => this.handleApproval(record.Id)}
-            >
-              <Button
-                style={{
-                  margin: "5px",
-                  backgroundColor: "#4CAF50",
-                  borderColor: "#4CAF50",
-                  color: "#fff",
-                }}
-              >
-                Onayla
-              </Button>
-            </Popconfirm>
-            <Popconfirm
-              key="reject"
-              title="Red Etmek İstediğinize Emin misiniz?"
-              okText="Evet"
-              cancelText="Hayır"
-              onConfirm={() => this.handleReject(record.Id)}
-            >
-              <Button
-                style={{
-                  margin: "5px",
-                }}
-                type="danger"
-              >
-                Reddet
-              </Button>
-            </Popconfirm>
-
+            {roleNames === "ExecutiveOrganizations" && (
+              <>
+                <Popconfirm
+                  key="success"
+                  title="Onaylamak İstediğinize Emin misiniz?"
+                  okText="Evet"
+                  cancelText="Hayır"
+                  onConfirm={() => this.handleApproval(record.Id)}
+                >
+                  <Button
+                    style={{
+                      margin: "5px",
+                      backgroundColor: "#4CAF50",
+                      borderColor: "#4CAF50",
+                      color: "#fff",
+                    }}
+                  >
+                    Onayla
+                  </Button>
+                </Popconfirm>
+                <Popconfirm
+                  key="reject"
+                  title="Red Etmek İstediğinize Emin misiniz?"
+                  okText="Evet"
+                  cancelText="Hayır"
+                  onConfirm={() => this.handleReject(record.Id)}
+                >
+                  <Button
+                    style={{
+                      margin: "5px",
+                    }}
+                    type="danger"
+                  >
+                    Reddet
+                  </Button>
+                </Popconfirm>
+              </>
+            )}
             <Button
               style={{
                 margin: "5px",
@@ -130,13 +136,19 @@ class MinistryPage extends Component {
             badgeText = "Onay";
           }
 
-          return <Badge status={badgeColor} text={badgeText} />;
+          return <Tag color={badgeColor}>{badgeText}</Tag>;
         },
       },
       {
         title: "Başvurulan İl",
         dataIndex: "CityOfWork",
         key: "CityOfWork",
+        filters: [...new Set(applications.map((item) => item.CityOfWork))].map((option) => ({
+          text: option,
+          value: option,
+        })),
+        onFilter: (value, record) => record.CityOfWork === value,
+        render: (text) => text,
       },
       {
         title: "Başvurulan Alan",

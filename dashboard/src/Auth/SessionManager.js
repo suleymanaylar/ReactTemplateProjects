@@ -5,6 +5,12 @@ const SessionManager = {
         if (token) return token;
         else return null;
     },
+    getRoleName() {
+        const token = localStorage.getItem('usersRole');
+        if (token) return token;
+        else return null;
+    },
+    
     getUserName() {
         const token = localStorage.getItem('userName');
         if (token) return token;

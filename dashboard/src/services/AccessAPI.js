@@ -16,10 +16,14 @@ export function getData(endPoint) {
   return fetch(BASE_URL + endPoint, payload)
     .then(function (response) {
       if (!response.ok) {
-        console.log(response);
+        // console.log(response);
         if (response.status === 401) {
           message.error("Yetkisiz Erişim");
           window.location.href = "/sign-in";
+        }
+       else if (response.status === 403) {
+          message.error("Bu Sayfaya Yetkiniz Bulunmamaktadır.!");
+          window.location.href = "/";
         }
       }
       return response.json();
@@ -29,6 +33,7 @@ export function getData(endPoint) {
     })
     .catch(function (error) {
       console.log(error);
+      message.error("Veri Çekilemedi. Hata : "+ error);
     });
 }
 
@@ -76,6 +81,7 @@ export function postData(endPoint, inputObj) {
     })
     .catch(function (error) {
       console.log(error);
+      message.error("Hata Oluştu. Hata : "+ error);
     });
 }
 
@@ -102,6 +108,7 @@ export function deleteData(endPoint) {
     })
     .catch(function (error) {
       console.log(error);
+      message.error("Hata Oluştu. Hata : "+ error);
     });
 }
 
@@ -126,5 +133,6 @@ export function putData(endPoint, obj) {
     })
     .catch(function (error) {
       console.log(error);
+      message.error("Hata Oluştu. Hata : "+ error);
     });
 }

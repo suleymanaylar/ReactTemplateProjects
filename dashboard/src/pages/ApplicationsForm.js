@@ -3,7 +3,6 @@ import { Form, Input, Col, Card,  Row } from "antd";
 
 const Applications = (props) => {
   const applicationsDetail = props.location.state?.applicationsDetail;
-  console.log(applicationsDetail);
   return (
     <div>
       <Col>

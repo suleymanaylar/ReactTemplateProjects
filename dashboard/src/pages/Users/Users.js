@@ -1,10 +1,8 @@
 import React, { Component } from "react";
 import { Table, Button, Modal, Form, Input, Select } from "antd";
 import { Popconfirm, message } from "antd";
-import "alertifyjs/build/css/alertify.css";
 import { PlusOutlined } from "@ant-design/icons";
-import { getUsersList } from "../axios/index";
-import { getData } from "../services/AccessAPI";
+import { getData, postData, deleteData } from "../../services/AccessAPI";
 
 export default class Users extends Component {
   state = {
@@ -19,44 +17,6 @@ export default class Users extends Component {
     await this.getUsers();
     await this.getRoles();
   }
-  // getUsersList = () => {
-  //   getUsersList()
-  //     .then((res) => {
-  //       this.setState({ users: res });
-  //     })
-  //     .catch((error) => {
-  //       if (error.response) {
-  //         message.error(error.response.data.message, 5);
-  //       } else {
-  //         console.error(error); // Hata mesajını daha ayrıntılı göstermek için console.error kullanabilirsiniz
-  //       }
-  //     });
-  // };
-
-  // getUsers = () => {
-  //   fetch("https://localhost:44307/api/user", {
-  //     headers: {
-  //       "Content-Type": "application/json",
-  //       Accept: "text/plain",
-  //       Authorization: `Bearer ${localStorage.getItem("authToken")}`,
-  //     },
-  //   })
-  //     .then((response) => {
-  //       if (!response.ok) {
-  //         throw new Error("Sunucudan veri alınamadı.");
-  //       }
-  //       return response.json();
-  //     })
-  //     .then((data) => {
-  //       // console.log("Sunucudan gelen veri:", data);
-  //       console.log(data);
-  //       this.setState({ users: data });
-  //     })
-  //     .catch((error) => {
-  //       console.error("Veri alımı hatası:", error);
-  //     });
-  // };
-
   getUsers = () => {
     getData(`/user`).then((result) => {
       let responseJson = result;
@@ -70,48 +30,22 @@ export default class Users extends Component {
     getData(`/Generals/GetAllRoleForTableDropdown`).then((result) => {
       let responseJson = result;
       if (responseJson) {
-        this.setState({ users: JSON.parse(responseJson) });
+        this.setState({ roles: JSON.parse(responseJson) });
       }
     });
-  };
-  getRoles = () => {
-    fetch("https://localhost:44307/api/Generals/GetAllRoleForTableDropdown")
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Sunucudan veri alınamadı.");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        //console.log("Sunucudan gelen veri:", data);
-        this.setState({ roles: data });
-      })
-      .catch((error) => {
-        console.error("Veri alımı hatası:", error);
-      });
   };
   handleEdit = (user) => {
     this.setState({ selectedUser: user, isModalVisible: true });
   };
 
   handleDelete = (userId) => {
-    fetch(`https://localhost:44307/api/user/${userId}`, {
-      method: "DELETE",
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Sunucudan silme işlemi gerçekleştirilemedi.");
-        }
-
+    deleteData("/user/" + userId).then((result) => {
+      let responseJson = result;
+      if (responseJson) {
         message.success("Silme işlemi başarıyla gerçekleştirildi.");
         this.getUsers();
-      })
-      .catch((error) => {
-        message.error("Silme işlemi hatası", error);
-      });
+      }
+    });
   };
 
   handleUpdate = () => {
@@ -135,31 +69,14 @@ export default class Users extends Component {
       Email: selectedUser.Email,
       Id: selectedUser.Id,
     };
-
-    // API'ye güncelleme isteği gönder
-    fetch("https://localhost:44307/api/user", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(updatedUserData),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Sunucu hatası: Güncelleme başarısız");
-        }
-        return response.json();
-      })
-      .then((data) => {
-        message.success("Güncelleme işlemi başarıyla gerçekleştirildi.");
+    postData("/user", updatedUserData).then((result) => {
+      let responseJson = result;
+      if (responseJson) {
+        message.success("Kullanıcı başarıyla Güncellendi.");
         this.getUsers();
-
-        // Modal'ı kapat
         this.setState({ isModalVisible: false });
-      })
-      .catch((error) => {
-        console.error("Güncelleme hatası:", error);
-      });
+      }
+    });
   };
 
   handleCancel = () => {
@@ -188,31 +105,14 @@ export default class Users extends Component {
       IdentityNumber: selectedUser.IdentityNumber,
       Email: selectedUser.Email,
     };
-
-    // API'ye ekleme isteği gönder
-    fetch("https://localhost:44307/api/user", {
-      method: "PUT",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(newUser),
-    })
-      .then((response) => {
-        if (!response.ok) {
-          throw new Error("Sunucu hatası: Kullanıcı eklenemedi");
-        }
-        return response.json();
-      })
-      .then((data) => {
+    postData("/user", newUser).then((result) => {
+      let responseJson = result;
+      if (responseJson) {
         message.success("Kullanıcı başarıyla eklendi.");
         this.getUsers();
-
-        // Modal'ı kapat
         this.setState({ isModalVisible: false });
-      })
-      .catch((error) => {
-        console.error("Kullanıcı ekleme hatası:", error);
-      });
+      }
+    });
   };
   validateEmail = (email) => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -254,11 +154,25 @@ export default class Users extends Component {
         title: "Tc Kimlik No",
         dataIndex: "IdentityNumber",
         key: "IdentityNumber",
+        filters: [...new Set(users.map((item) => item.IdentityNumber))].map(
+          (option) => ({
+            text: option,
+            value: option,
+          })
+        ),
+        onFilter: (value, record) => record.IdentityNumber === value,
+        render: (text) => text,
       },
       {
         title: "İsim",
         dataIndex: "Name",
         key: "Name",
+        filters: [...new Set(users.map((item) => item.Name))].map((option) => ({
+          text: option,
+          value: option,
+        })),
+        onFilter: (value, record) => record.Name === value,
+        render: (text) => text,
       },
       {
         title: "Soyisim",
@@ -274,6 +188,14 @@ export default class Users extends Component {
         title: "Role",
         dataIndex: "RoleName",
         key: "RoleName",
+        filters: [...new Set(users.map((item) => item.RoleName))].map(
+          (option) => ({
+            text: option,
+            value: option,
+          })
+        ),
+        onFilter: (value, record) => record.RoleName === value,
+        render: (text) => text,
       },
       {
         title: "İşlemler",
